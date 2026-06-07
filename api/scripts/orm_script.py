@@ -5,6 +5,9 @@ from django.db import connection
 from pprint import pprint
 
 def run():
+    ################ CREATE and READ #################
+    
+    
     # restaurant = Restaurant() # instance (obj) of restaurant
     # restaurant.name = 'My Italian Restaurant'
     # restaurant.latitude = 56.2
@@ -100,14 +103,48 @@ def run():
     #     datetime=timezone.now()
     # )
 
-    user = User.objects.first()
-    restaurant = Restaurant.objects.first()
+    # user = User.objects.first()
+    # restaurant = Restaurant.objects.first()
 
-    rating, created = Rating.objects.get_or_create( # tuple (data, boolean) -> True means obj created
-        restaurant=restaurant,
-        user=user,
-        rating=4
-    ) 
+    # rating, created = Rating.objects.get_or_create( # tuple (data, boolean) -> True means obj created
+    #     restaurant=restaurant,
+    #     user=user,
+    #     rating=4
+    # ) 
 
 
-    pprint(connection.queries)
+    # pprint(connection.queries)
+    
+    
+    
+    ################### UPDATE and DELETE #####################
+    # restaurant = Restaurant.objects.first()
+    # print(restaurant.name)
+    
+    # restaurant.name = 'My Bangladeshi Restaurant'
+    # restaurant.save(update_fields=['name']) # only update name field
+    
+    # print(restaurant.name)
+    
+    # print(connection.queries)
+    
+    
+    # update all fields once
+    # restaurant = Restaurant.objects.filter(name__contains='Bangladesh') # __contains is a lookup
+    # restaurants = Restaurant.objects.all()
+    # print(
+    #     restaurants.update(
+    #         date_opened=timezone.now() - timezone.timedelta(700), # updates all restaurant's timezone at once
+    #         website='www.test.com'
+    #     )
+    # )
+    # # print(restaurant)
+    # print(connection.queries)
+
+    
+    ## Delete
+    # restaurant = Restaurant.objects.all()[1]
+    # print(restaurant.delete())
+    Restaurant.objects.all().delete()
+    print(connection.queries)
+     
