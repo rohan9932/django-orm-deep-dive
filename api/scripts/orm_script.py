@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db import connection
 from pprint import pprint
+from django.db.models.functions import Lower
 
 def run():
     ################ CREATE and READ #################
@@ -145,6 +146,52 @@ def run():
     ## Delete
     # restaurant = Restaurant.objects.all()[1]
     # print(restaurant.delete())
-    Restaurant.objects.all().delete()
-    print(connection.queries)
+    # Restaurant.objects.all().delete()
+    
+    
+    # pprint(Restaurant.objects.filter(restaurant_type=Restaurant.TypeChoices.CHINESE))
+    # pprint(Restaurant.objects.filter(restaurant_type=Restaurant.TypeChoices.CHINESE, name__startswith='C'))
+    
+    # check_types = [Restaurant.TypeChoices.CHINESE, Restaurant.TypeChoices.INDIAN, Restaurant.TypeChoices.MEXICAN]
+    
+    # restaurant = Restaurant.objects.filter(restaurant_type__in=check_types)
+    # restaurant = Restaurant.objects.exclude(restaurant_type__in=check_types)
+    
+    # restaurant = Restaurant.objects.filter(longitude__lt=0)
+    # pprint(restaurant)
+    
+    
+    # sales = Sale.objects.select_related('restaurant').filter(income__range=(50, 60))
+    # print([[sale.restaurant.name, float(sale.income)] for sale in sales])
+
+    # r = Restaurant.objects.first()
+    # r.name = r.name.lower()
+    # r.save()
+    
+    # # restaurants = Restaurant.objects.order_by('-name') # minus means desc (case sensitive)
+    
+    # # solution here is to apply lowercase in db
+    
+    # # restaurants = Restaurant.objects.order_by(Lower('name')) # case insensitive now
+    # restaurants = Restaurant.objects.all() # now  called by default ordering set in Meta class
+    # print(restaurants)
+
+    # # give use sales list by latest ones on top
+    # sales = Sale.objects.order_by('-datetime')[:5]
+    # print(sales)
+    
+    
+    # restaurant = Restaurant.objects.earliest('date_opened') # just convenience function
+    # restaurant2 = Restaurant.objects.latest()
+    # print(restaurant, restaurant2)
+    
+    
+    # print(Rating.objects.filter(restaurant__name__startswith='C'))
+    
+    
+    sales = Sale.objects.filter(restaurant__restaurant_type=Restaurant.TypeChoices.CHINESE)
+    print(sales)
      
+    pprint(connection.queries)
+    
+    
