@@ -24,6 +24,12 @@ class Restaurant(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        print(self._state.adding) # checking if a obj is added in the model
+        # for eg. it can be helpful in a scenario where when use login for the first time
+        # they get an email in their inbox
+        super().save(*args, **kwargs)
 
 
 class Rating(models.Model):
