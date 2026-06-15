@@ -3,8 +3,9 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db import connection
 from pprint import pprint
-from django.db.models.functions import Lower, Upper
-from django.db.models.aggregates import Count
+from django.db.models.functions import Lower, Upper, Length, Concat
+from django.db.models.aggregates import Count, Avg, Min, Max, Sum
+from django.db.models import CharField, Value
 import random
 
 def run():
@@ -280,6 +281,62 @@ def run():
 
 
     # Aggregation
-    print(Restaurant.objects.filter(name__istartswith='p').count())
-    print(Restaurant.objects.aggregate(Count('id')))
-    print(connection.queries)
+    # print(Restaurant.objects.filter(name__istartswith='p').count())
+    # print(Restaurant.objects.aggregate(total=Count('id'))) #a dict so can't apply .filter() etc functions after .aggregate
+    # print(Rating.objects.aggregate(average=Avg('rating')))
+    # print(Rating.objects.filter(restaurant__name__istartswith='p').aggregate(avg=Avg('rating')))
+    
+    # one_month_ago = timezone.now() - timezone.timedelta(days=31)
+    
+    # sales = Sale.objects.filter(datetime__gte=one_month_ago)
+    
+    # print(sales.aggregate(
+    #     min=Min('income'),
+    #     max=Max('income'),
+    #     avg=Avg('income'),
+    #     sum=Sum('income')
+    # ))
+    
+    
+    ## Annotations -> used for adding a col temporarily for a response
+    
+    # # fetch all the restaurants -> get number of chars in the restaurant name
+    
+    # restaurants = Restaurant.objects.annotate(name_len=Length('name')).filter(name_len__gte=10)
+    # print(restaurants.values('name', 'name_len'))
+    
+    
+    
+    # concatenation = Concat(
+    #     'name', Value(' [Rating: '), 'ratings__rating', Value(']'),
+    #     output_field=CharField()
+    # )
+    
+    # restaurants = Restaurant.objects.annotate(message=concatenation).values_list('message', flat=True)
+    
+    # restaurants = Restaurant.objects.annotate(total_sale=Sum('sales__income')).filter(name__istartswith='c').values('total_sale')
+    
+    # when we type values() before .annotate() it works GROUP_BY under the hood
+    # restaurants = Restaurant.objects \
+    # .values('restaurant_type') \
+    # .annotate(
+    #     total_ratings=Count('ratings'),
+    #     avg_rating=Avg('ratings__rating')
+    # )
+    
+    
+    # restaurants = Restaurant.objects.annotate(
+    #     total_sales=Sum('sales__income')
+    # ).order_by('-total_sales')
+    
+    restaurants = Restaurant.objects.annotate(
+        total_sales=Sum('sales__income')
+    ).filter(total_sales__lt=300)
+    
+    print(restaurants.aggregate(avg_sales=Avg('total_sales')))
+    
+    
+    # print(restaurants)
+    print([r.total_sales for r in restaurants])
+        
+    pprint(connection.queries)
