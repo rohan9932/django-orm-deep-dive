@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db import connection
 from pprint import pprint
-from django.db.models.functions import Lower
+from django.db.models.functions import Lower, Upper
+from django.db.models.aggregates import Count
 import random
 
 def run():
@@ -223,7 +224,7 @@ def run():
     # restaurant = Restaurant.objects.first()
     # restaurant2 = Restaurant.objects.last()
     
-    staff, created = Staff.objects.get_or_create(name='John Wick')
+    # staff, created = Staff.objects.get_or_create(name='John Wick')
     
     # StaffRestaurant.objects.create(
     #     staff=staff, restaurant=restaurant, salary=28_000
@@ -241,7 +242,44 @@ def run():
     # staff.restaurants.add(restaurant, through_defaults={'salary': 28_000})
 
     
-    staff.restaurants.set(
-        Restaurant.objects.all()[:10],
-        through_defaults={'salary': random.randint(20_000, 80_000)}
-    )
+    # staff.restaurants.set(
+    #     Restaurant.objects.all()[:10],
+    #     through_defaults={'salary': random.randint(20_000, 80_000)}
+    # )
+
+
+
+
+    ####################### Data Aggregation and Annotation #################################
+
+
+    # restaurant = Restaurant.objects.values('name', 'date_opened')
+    # print(restaurant)
+
+    # print(connection.queries)
+
+    # # db functions
+    # restaurant_up = Restaurant.objects.values(name_upper=Upper('name'))
+    # print(restaurant_up)
+
+    # print(connection.queries)
+    
+
+    # # foreign key with values()
+    # rating_details = Rating.objects.filter(
+    #     restaurant__restaurant_type=Restaurant.TypeChoices.ITALIAN
+    # ).values(
+    #     'restaurant__name', 'rating'
+    # )
+
+    # print(rating_details)
+
+    # # value list 
+    # restaurant_names = Restaurant.objects.values_list('name', flat=True)
+    # print(restaurant_names)
+
+
+    # Aggregation
+    print(Restaurant.objects.filter(name__istartswith='p').count())
+    print(Restaurant.objects.aggregate(Count('id')))
+    print(connection.queries)
